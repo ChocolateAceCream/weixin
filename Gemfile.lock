@@ -50,7 +50,7 @@ GEM
       treetop (~> 1.4.8)
     mime-types (1.21)
     multi_json (1.5.0)
-    mysql2 (0.3.11)
+    pg (0.18.2)
     polyglot (0.3.3)
     rack (1.4.5)
     rack-cache (1.2)
@@ -101,8 +101,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  coffee-rails (~> 3.2.1)
-  mysql2
-  rails (= 3.2.11)
-  sass-rails (~> 3.2.3)
-  uglifier (>= 1.0.3)
+  coffee-rails
+  pg
+  rails
+  sass-rails
+  uglifier
+
+BUNDLED WITH
+   1.10.2
