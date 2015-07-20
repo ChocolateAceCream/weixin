@@ -9,7 +9,14 @@ WeixinRailsMiddleware::WeixinController.class_eval do
   end
 
   private
-
+	
+    def generate_menu
+  	weixin_client = WeixinAuthorize::Client.new(@current_public_account.app_key, @current_public_account.app_secret)
+  	menu   = @current_public_account.build_menu
+  	result = weixin_client.create_menu(menu)
+  	set_error_message(result["errmsg"]) if result["errcode"] != 0
+  	redirect_to public_account_diymenus_path(@current_public_account)
+    end
     def response_text_message(options={})
       reply_text_message("Your Message: #{@keyword}")
     end
