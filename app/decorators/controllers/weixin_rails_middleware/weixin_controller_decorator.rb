@@ -7,6 +7,62 @@ WeixinRailsMiddleware::WeixinController.class_eval do
   def reply
     render xml: send("response_#{@weixin_message.MsgType}_message", {})
   end
+   
+  def get_access_token
+    if Rails.cache.read("access_token").nil?
+      uri = URI("https://api.weixin.qq.com/cgi-bin/token")
+      params = {:grant_type=>"client_credential",:appid=>"your appid",:secret=>"your appsecret"}
+      uri.query = URI.encode_www_form(params)
+      res = Net::HTTP.get_response(uri)
+      @access_token = JSON.parse(res.body)["access_token"]
+      Rails.cache.write("access_token", @access_token, expires_in: 5.minutes)
+      @access_token
+    else
+      @access_token = Rails.cache.read("access_token")
+    end
+  end
+  
+  def addmenu
+    post_url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token=#{get_access_token}"
+    post_data = {
+      :button=>[{
+        :type=>'view',
+        :name=>'城市景点',
+        :url=> 'http://liuminhan.tunnel.mobi/city/route'},
+        {
+          :name=>'搜索',
+          :sub_button=> [
+            {
+              :type=>'view',
+              :name=> '查询城市',
+              :url=> 'http://liuminhan.tunnel.mobi/city/index'
+            },
+            {
+              :type=>'click',
+              :name=>'附近酒店',
+              :key=>'hotel'
+            },
+            {
+              :type=>'view',
+              :name=>'附近影院',
+              :url=>'http://v.qq.com/'
+            },
+            {
+              :type=>'click',
+              :name=>'我的收藏',
+              :key=>'V1001_GOOD'
+            }]
+        },
+        {
+          :type=>'click',
+          :name=>'天气预报',
+          :key=>'V1002_TODAY_WEATHER'
+        }]
+    }
+    Typhoeus::Request.post(post_url, body: post_data.to_json)
+    render nothing:true
+  end
+
 
   private
 	
